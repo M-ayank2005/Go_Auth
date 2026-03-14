@@ -13,23 +13,25 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Failed to load .env file")
+		log.Println("No .env file found, using system environment variables")
 	}
 
 	if os.Getenv("JWT_SECRET") == "" {
 		log.Fatal("JWT_SECRET is not set")
 	}
 
-
-
 	db.Connect()
 
 	handlers := routes.RegisterRoutes()
 
-	log.Println("Server running on Port :8080")
-	if err := http.ListenAndServe(":8080", handlers); err != nil {
-		log.Fatalf("Could not start server: %s\n", err.Error())
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
 
+	log.Printf("Server running on Port :%s\n", port)
+	if err := http.ListenAndServe(":"+port, handlers); err != nil {
+		log.Fatalf("Could not start server: %s\n", err.Error())
+	}
 }
 
